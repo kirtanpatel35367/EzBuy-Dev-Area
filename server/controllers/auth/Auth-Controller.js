@@ -62,7 +62,7 @@ const UserRegister = async (req, res) => {
 
 //Login
 
-const VerifyOtpLogin = async (req, res) => {
+const UserLogin = async (req, res) => {
   const LoginSchema = Joi.object({
     email: Joi.string()
       .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
@@ -101,46 +101,50 @@ const VerifyOtpLogin = async (req, res) => {
         data: checkPassword,
       });
 
-    // const token = jwt.sign(
-    //   {
-    //     id: checkUser._id,
-    //     role: checkUser.role,
-    //     email: checkUser.email,
-    //     username: checkUser.username,
-    //   },
-    //   "CLIENT_SECRET_KEY",
-    //   { expiresIn: "60m" }
-    // );
+    //Here if 2FA is Enabled then Send OTP to Email and Verify OTP to Login else Login Directly
+    if (checkUser.is2FAEnabled) {
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      checkUser.otp = otp;
+      checkUser.otpExpiry = Date.now() + 5 * 60 * 1000; // valid for 5 mins
+      await checkUser.save();
 
-    // res
-    //   .cookie("jwtToken", token, {
-    //     httpOnly: true,
-    //     secure: false,
-    //     sameSite: "Lax",
-    //   })
-    //   .json({
-    //     success: true,
-    //     message: "User Logged In SuccesFully",
-    //     user: {
-    //       email: checkUser.email,
-    //       role: checkUser.role,
-    //       id: checkUser._id,
-    //       username: checkUser.username,
-    //     },
-    //   });
+      // ✅ Send OTP via email (Nodemailer)
+      await sendOTPEmail(checkUser.email, otp);
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    checkUser.otp = otp;
-    checkUser.otpExpiry = Date.now() + 5 * 60 * 1000; // valid for 5 mins
-    await checkUser.save();
+      return res.json({
+        is2FAEnabled: checkUser.is2FAEnabled,
+        success: true,
+        message: "OTP sent to your email. Please verify.",
+      });
+    } else {
+      const token = jwt.sign(
+        {
+          id: checkUser._id,
+          role: checkUser.role,
+          email: checkUser.email,
+          username: checkUser.username,
+        },
+        process.env.CLIENT_SECRET_KEY, // use env variable
+        { expiresIn: "60m" }
+      );
 
-    // ✅ Send OTP via email (Nodemailer)
-    await sendOTPEmail(checkUser.email, otp);
-
-    return res.json({
-      success: true,
-      message: "OTP sent to your email. Please verify.",
-    });
+      res
+        .cookie("jwtToken", token, {
+          httpOnly: true,
+          secure: false, // set true in production with HTTPS
+          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+        })
+        .json({
+          success: true,
+          message: "User Logged In SuccesFully",
+          user: {
+            email: checkUser.email,
+            role: checkUser.role,
+            id: checkUser._id,
+            username: checkUser.username,
+          },
+        });
+    }
   } catch (error) {
     res.status(400).json({
       success: false,
@@ -172,7 +176,7 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-const UserLogin = async (req, res) => {
+const UserLoginwithOTPVerification = async (req, res) => {
   const { email, otp } = req.body;
 
   try {
@@ -240,12 +244,40 @@ const Userlogout = (req, res) => {
   });
 };
 
+//2FA Authentication
+const EnableDisable2FA = async (req, res) => {
+  const { email, enable2FA } = req.body; // 👈 frontend sends true/false
+
+  if (typeof enable2FA !== "boolean") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid value for enable2FA",
+    });
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(400).json({ success: false, message: "User not found" });
+  }
+
+  user.is2FAEnabled = enable2FA; // 👈 directly set
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    is2FAEnabled: user.is2FAEnabled,
+    message: `2FA ${enable2FA ? "enabled" : "disabled"} successfully`,
+  });
+};
+
 //Auth Middleware
 
 module.exports = {
   UserRegister,
-  UserLogin,
+  UserLoginwithOTPVerification,
   Userlogout,
   authMiddleware,
-  VerifyOtpLogin,
+  UserLogin,
+  EnableDisable2FA,
 };

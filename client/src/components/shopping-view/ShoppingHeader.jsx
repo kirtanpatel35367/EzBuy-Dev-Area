@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ShopLogo from "../../assets/shoplogo.png";
 import { TiThMenu } from "react-icons/ti";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -16,7 +15,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
 import { UserLogout } from "../../store/auth-slice/index";
@@ -53,7 +51,7 @@ const MenuItems = () => {
 
 const HeaderRightContent = () => {
   const dispatch = useDispatch();
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shoppingcart);
   const navigate = useNavigate();
   const [openCartsheet, setOpenCartSheet] = useState(false);
@@ -63,8 +61,11 @@ const HeaderRightContent = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchCartItems(user?.id));
-  }, [dispatch]);
+    if (user?.id) {
+      console.log(user.id, "User id from Fetch Cart Items");
+      dispatch(fetchCartItems(user.id));
+    }
+  }, [dispatch, user?.id]); // Keep user?.id dependency but ensure it only refetches when userId actually changes
 
   return (
     <div className="flex md:text-slate-800  lg:items-center lg:flex-row flex-col gap-4">
@@ -107,9 +108,9 @@ const HeaderRightContent = () => {
           sideOffset={15}
           className="w-40 gap-4"
         >
-          <DropdownMenuLabel
+          <DropdownMenuItem
             onClick={() => navigate("/shop/useraccount")}
-            className="hover:bg-slate-700 cursor-pointer hover:text-white rounded-md"
+            className="hover:bg-[#682c0d] cursor-pointer hover:text-white rounded-md"
           >
             <div>
               <span className="flex gap-2">
@@ -117,16 +118,16 @@ const HeaderRightContent = () => {
                 Your Space
               </span>
             </div>
-          </DropdownMenuLabel>
-          <DropdownMenuLabel
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={handleLogout}
-            className="cursor-pointer w-30 hover:bg-slate-700 rounded-md hover:text-white"
+            className="cursor-pointer w-30 hover:bg-[#682c0d] rounded-md hover:text-white"
           >
             <span className="flex gap-2">
               <IoMdLogOut className="flex w-5 h-5" />
               Logout
             </span>
-          </DropdownMenuLabel>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -135,7 +136,7 @@ const HeaderRightContent = () => {
 
 const ShoppingHeader = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { isAuthanticated, user } = useSelector((state) => state.auth);
+  const { isAuthanticated } = useSelector((state) => state.auth);
 
   const handleToggleSheet = () => {
     setIsSheetOpen((prev) => !prev);
@@ -146,8 +147,7 @@ const ShoppingHeader = () => {
       <header className="sticky top-0 z-40 w-full border-b bg-[#f1ebe7]">
         <div className="flex h-20 items-center justify-between px-4 md:px-6">
           <Link to="/shop/home" className="flex items-center">
-            <img src={ShopLogo} className="w-28 h-auto" />
-            {/* <Logo /> */}
+            <Logo />
           </Link>
 
           <div className="hidden lg:flex flex-1 justify-center text-white font-HeadFont">

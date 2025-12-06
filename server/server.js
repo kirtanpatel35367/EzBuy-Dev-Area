@@ -5,10 +5,13 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const AuthRouter = require("./routes/Auth-Route/Auth-Route");
 const AdminProductRouter = require("./routes/admin/AdminProductRoute");
+const AdminReviewRouter = require("./routes/admin/admin-review-routes");
 const ShopProductRouter = require("./routes/Shop/shop-routes");
 const CartRouter = require("./routes/Shop/cart-routes");
 const AddressRouter = require("./routes/Shop/address-routes");
 const OrderRouter = require("./routes/Shop/order-routes");
+const ReviewRouter = require("./routes/Shop/review-routes");
+const UserRouter = require("./routes/User/User-Routes");
 const app = express();
 
 //CORS
@@ -56,10 +59,13 @@ mongoose
 //Auth Middleware
 app.use("/api/auth", AuthRouter);
 app.use("/api/admin/products", AdminProductRouter);
+app.use("/api/admin/reviews", AdminReviewRouter);
 app.use("/api/shop/products", ShopProductRouter);
 app.use("/api/shop/cart", CartRouter);
 app.use("/api/shop/address", AddressRouter);
 app.use("/api/shop/order", OrderRouter);
+app.use("/api/shop/reviews", ReviewRouter);
+app.use("/api/user", UserRouter);
 
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {

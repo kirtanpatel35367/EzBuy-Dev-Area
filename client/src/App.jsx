@@ -9,9 +9,11 @@ import {
   Navigate,
 } from "react-router-dom";
 import HashLoader from "react-spinners/HashLoader";
+import { Toaster } from "sonner";
 import AuthLayout from "./components/auth/layout";
 import Authlogin from "./pages/auth/login";
 import Authregister from "./pages/auth/register";
+import VerifyOTP from "./pages/auth/verify-otp";
 import Adminlayout from "./components/admin-view/layout";
 import AdminOrders from "./pages/admin-view/AdminOrders";
 import AdminProducts from "./pages/admin-view/Product";
@@ -21,7 +23,7 @@ import PageNotFound from "./pages/page-not-found/PageNotFound";
 import HomePage from "./pages/shopping-view/HomePage";
 import ProductListing from "./pages/shopping-view/ProductListing";
 import CheckOut from "./pages/shopping-view/CheckOut";
-import Accountpage from "./pages/shopping-view/Accountpage";
+import UserProfilePage from "./pages/shopping-view/UserProfilePage";
 import CheckAuth from "./components/common/CheckAuth";
 import Unauth from "./pages/unAuthPage/Unauth";
 import Success from "./pages/shopping-view/success";
@@ -78,6 +80,7 @@ const App = () => {
           >
             <Route path="login" element={<Authlogin />} />
             <Route path="register" element={<Authregister />} />
+            <Route path="verify-otp" element={<VerifyOTP />} />
           </Route>
 
           {/* Admin part  */}
@@ -114,7 +117,7 @@ const App = () => {
             <Route path="home" element={<HomePage />} />
             <Route path="productList" element={<ProductListing />} />
             <Route path="checkout" element={<CheckOut />} />
-            <Route path="useraccount" element={<Accountpage />} />
+            <Route path="useraccount" element={<UserProfilePage />} />
             <Route path="success" element={<Success />} />
             <Route path="cancel" element={<Canncel />} />
           </Route>
@@ -122,6 +125,7 @@ const App = () => {
           <Route path="*" element={<PageNotFound />}></Route>
         </Routes>
       </div>
+      <Toaster position="top-right" richColors />
     </>
   );
 };

@@ -5,6 +5,7 @@ import shoppingCartReducer from './shop/cart-slice/index'
 import AddresscartReducer from './shop/address-slice/index'
 import OrderDetailsReducer from './shop/order-slice/index'
 import authReducer from './auth-slice'
+import reviewReducer from './shop/review-slice/index'
 
 
 const store = configureStore({
@@ -14,7 +15,8 @@ const store = configureStore({
         shopProducts: shopProductReducer,
         shoppingcart: shoppingCartReducer,
         addressCart: AddresscartReducer,
-        orderDetails: OrderDetailsReducer
+        orderDetails: OrderDetailsReducer,
+        reviews: reviewReducer
     }
 })
 
