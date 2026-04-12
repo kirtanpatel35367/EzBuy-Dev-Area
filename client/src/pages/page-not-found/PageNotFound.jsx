@@ -1,77 +1,66 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, ArrowLeft, Search } from "lucide-react";
+import { Home, ArrowLeft, Search, Zap, Globe } from "lucide-react";
 
 const PageNotFound = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f1ebe7] via-[#f4ddbe] to-[#f1ebe7] flex items-center justify-center px-4">
-      <div className="max-w-2xl w-full text-center">
-        {/* 404 Number with Animation */}
-        <div className="mb-8">
-          <h1 className="text-9xl md:text-[12rem] font-bold text-[#682c0d] opacity-20 select-none">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 overflow-hidden relative">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none animate-pulse"></div>
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none animate-pulse delay-700"></div>
+      
+      <div className="max-w-4xl w-full text-center relative z-10">
+        {/* 404 Number with Neon Glow */}
+        <div className="mb-12 relative group">
+          <div className="absolute inset-0 bg-primary/5 blur-[100px] rounded-full scale-150 group-hover:bg-primary/10 transition-all duration-1000"></div>
+          <h1 className="text-[12rem] md:text-[20rem] font-black leading-none text-white tracking-tighter opacity-5 select-none drop-shadow-2xl">
             404
           </h1>
+          <div className="absolute inset-0 flex items-center justify-center">
+             <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full">
+                   <Zap size={14} className="text-red-500 fill-red-500" />
+                   <span className="text-xs font-black text-red-500 uppercase tracking-widest">Protocol Interrupted</span>
+                </div>
+                <h2 className="text-4xl md:text-7xl font-black text-white uppercase tracking-tighter">
+                   LOST IN THE <br /> <span className="text-primary italic">ECOSYSTEM.</span>
+                </h2>
+             </div>
+          </div>
         </div>
 
         {/* Main Content */}
-        <div className="relative -mt-32 md:-mt-40">
-          {/* Icon/Illustration */}
-          <div className="mb-6 flex justify-center">
-            <div className="relative">
-              <div className="w-32 h-32 md:w-40 md:h-40 bg-[#f4ddbe] rounded-full flex items-center justify-center shadow-lg border-4 border-[#682c0d]/20">
-                <Search className="w-16 h-16 md:w-20 md:h-20 text-[#682c0d]" />
-              </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#682c0d] rounded-full animate-pulse"></div>
-            </div>
-          </div>
-
-          {/* Title */}
-          <h2 className="text-3xl md:text-5xl font-bold text-[#682c0d] mb-4">
-            Oops! Page Not Found
-          </h2>
-
-          {/* Description */}
-          <p className="text-lg md:text-xl text-[#937c6c] mb-8 max-w-md mx-auto">
-            The page you're looking for seems to have wandered off. Don't worry,
-            let's get you back on track!
+        <div className="space-y-8 max-w-lg mx-auto">
+          <p className="text-lg md:text-xl text-white/40 font-bold uppercase tracking-widest leading-relaxed">
+            The coordinates you've requested do not exist in the current reality. 
+            Security protocols have been initiated.
           </p>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
             <Button
               onClick={() => navigate("/shop/home")}
-              className="bg-[#682c0d] hover:bg-[#682c0d]/90 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-primary text-black font-black h-16 px-10 rounded-2xl text-lg hover:scale-[1.05] transition-all shadow-[0_0_30px_rgba(204,255,0,0.2)] flex gap-3"
             >
-              <Home className="mr-2 w-5 h-5" />
-              Go to Home
+              <Home size={20} /> INITIALIZE HOME
             </Button>
             <Button
               onClick={() => navigate(-1)}
               variant="outline"
-              className="border-2 border-[#682c0d] text-[#682c0d] hover:bg-[#682c0d] hover:text-white px-8 py-6 text-lg transition-all duration-300"
+              className="border-white/10 bg-white/5 text-white/60 hover:text-white h-16 px-10 rounded-2xl text-lg font-black flex gap-3"
             >
-              <ArrowLeft className="mr-2 w-5 h-5" />
-              Go Back
+              <ArrowLeft size={20} /> REVERT PATH
             </Button>
           </div>
 
-          {/* Decorative Elements */}
-          <div className="mt-12 flex justify-center gap-2">
-            <div
-              className="w-2 h-2 bg-[#682c0d] rounded-full animate-bounce"
-              style={{ animationDelay: "0s" }}
-            ></div>
-            <div
-              className="w-2 h-2 bg-[#682c0d] rounded-full animate-bounce"
-              style={{ animationDelay: "0.2s" }}
-            ></div>
-            <div
-              className="w-2 h-2 bg-[#682c0d] rounded-full animate-bounce"
-              style={{ animationDelay: "0.4s" }}
-            ></div>
+          <div className="flex items-center justify-center gap-12 pt-16 opacity-10">
+             <Globe size={40} className="text-white" />
+             <div className="w-px h-12 bg-white/20"></div>
+             <div className="text-left font-black tracking-tighter leading-none">
+                BUILD <br /> STATUS: <span className="text-primary">EZ-v2.0</span>
+             </div>
           </div>
         </div>
       </div>

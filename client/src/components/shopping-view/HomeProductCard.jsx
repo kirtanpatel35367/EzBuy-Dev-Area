@@ -1,22 +1,18 @@
-import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
-import { BrandOptionMap, CategoryOptionMap } from "@/config";
-import { ShoppingCart, Star, ArrowUpRight } from "lucide-react";
+import React from "react";
+import { ShoppingCart, Star, Heart, ArrowUpRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
-function FetchShoppingProducts({
-  product,
-  handleAddtoCart,
-}) {
+const HomeProductCard = ({ product, handleAddToCart }) => {
   const navigate = useNavigate();
   const discount = product?.salePrice > 0 ? Math.round(((product.price - product.salePrice) / product.price) * 100) : 0;
 
   return (
     <div className="group premium-card rounded-2xl p-3 flex flex-col h-full hover:scale-[1.02] transition-all duration-500">
-      {/* Image Section */}
+      {/* Product Image Container */}
       <div 
-        onClick={() => navigate(`/shop/product/${product?._id}`)}
         className="relative aspect-square rounded-xl overflow-hidden bg-white/5 cursor-pointer"
+        onClick={() => navigate(`/shop/product/${product?._id}`)}
       >
         <img
           src={product?.image}
@@ -36,14 +32,16 @@ function FetchShoppingProducts({
               LOW STOCK
             </Badge>
           )}
-           {product?.totalStock === 0 && (
-            <Badge className="bg-muted text-white/50 font-bold border-none px-2 rounded-sm text-[10px]">
-              SOLDOUT
-            </Badge>
-          )}
         </div>
 
-        {/* Quick Transition Overlay */}
+        {/* Hover Actions */}
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button className="p-2 bg-black/50 backdrop-blur-md rounded-full text-white hover:text-primary transition-colors">
+            <Heart size={16} />
+          </button>
+        </div>
+
+        {/* View Details Button Overlay */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-center gap-2 text-white text-xs font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
             View Details <ArrowUpRight size={14} />
@@ -51,15 +49,13 @@ function FetchShoppingProducts({
         </div>
       </div>
 
-      {/* Content Section */}
+      {/* Product Info */}
       <div className="mt-4 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-1">
-          <p className="text-[10px] text-primary font-bold uppercase tracking-widest">
-            {BrandOptionMap[product?.brand]}
-          </p>
+          <p className="text-[10px] text-primary font-bold uppercase tracking-widest">{product?.brand}</p>
           <div className="flex items-center gap-1">
             <Star className="w-3 h-3 fill-primary text-primary" />
-            <span className="text-[10px] text-white/50">4.8</span>
+            <span className="text-[10px] text-white/50">4.9</span>
           </div>
         </div>
 
@@ -81,7 +77,7 @@ function FetchShoppingProducts({
           </div>
 
           <button
-            onClick={() => handleAddtoCart(product?._id, product?.totalStock)}
+            onClick={() => handleAddToCart(product?._id, product?.totalStock)}
             disabled={product?.totalStock === 0}
             className="p-3 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-primary hover:text-black hover:border-primary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
           >
@@ -91,6 +87,6 @@ function FetchShoppingProducts({
       </div>
     </div>
   );
-}
+};
 
-export default FetchShoppingProducts;
+export default HomeProductCard;

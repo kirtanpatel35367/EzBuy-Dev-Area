@@ -25,6 +25,8 @@ export const VerifyOtpLogin = createAsyncThunk(
   }
 );
 
+export const verifyOTP = VerifyOtpLogin;
+
 //CreateThunk For sending Data to API from Register Form
 export const registerUser = createAsyncThunk(
   "/auth/register",
@@ -89,6 +91,22 @@ export const GetUserNotifications = createAsyncThunk(
   async ({ userId }) => {
     const response = await axiosClient.get(
       `user/get-user-notifications/${userId}`
+    );
+    return response.data;
+  }
+);
+
+export const UpdateUserDetails = createAsyncThunk(
+  "/user/update-user-details",
+  async ({ userId, firstName, lastName, phone, email }) => {
+    const response = await axiosClient.put(
+      `user/update-user-details/${userId}`,
+      {
+        firstName,
+        lastName,
+        phone,
+        email,
+      }
     );
     return response.data;
   }
@@ -205,6 +223,16 @@ const authSlice = createSlice({
       })
       .addCase(GetUserNotifications.rejected, (state) => {
         state.notificationsLoading = false;
+      })
+      .addCase(UpdateUserDetails.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(UpdateUserDetails.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+      })
+      .addCase(UpdateUserDetails.rejected, (state) => {
+        state.isLoading = false;
       });
   },
 });

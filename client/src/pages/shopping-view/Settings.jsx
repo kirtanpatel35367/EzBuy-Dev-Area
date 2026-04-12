@@ -10,11 +10,11 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { EnableDisable2FA, GetUserNotifications } from "@/store/auth-slice";
+import { ShieldAlert, Bell, Fingerprint, Download, Trash2, KeyRound } from "lucide-react";
 
 const Settings = () => {
   const dispatch = useDispatch();
 
-  // CRITICAL FIX: Select only what you need, separately
   const notifications = useSelector((state) => state.auth.notifications);
   const notificationsLoading = useSelector(
     (state) => state.auth.notificationsLoading
@@ -22,30 +22,20 @@ const Settings = () => {
   const userId = useSelector((state) => state.auth.user?.id);
   const email = useSelector((state) => state.auth.user?.email);
 
-  // Local state for notifications
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [smsNotifications, setSmsNotifications] = useState(false);
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
 
-  // Critical: Track if we've already fetched to prevent refetch
   const hasFetchedForUserRef = useRef(null);
-  // Track if we're in the middle of a 2FA toggle to prevent re-sync
   const isToggling2FARef = useRef(false);
 
-  // STEP 1: Fetch notifications ONLY ONCE per userId
   useEffect(() => {
-    // Only fetch if:
-    // 1. We have a userId
-    // 2. We haven't fetched for THIS specific userId yet
     if (userId && hasFetchedForUserRef.current !== userId) {
-      console.log("✅ Fetching notifications for userId:", userId);
       hasFetchedForUserRef.current = userId;
       dispatch(GetUserNotifications({ userId }));
     }
   }, [userId, dispatch]);
 
-  // STEP 2: Sync local state with Redux - only when actual values change
-  // Skip syncing if we're in the middle of a toggle to prevent flash
   useEffect(() => {
     if (notifications && !isToggling2FARef.current) {
       setEmailNotifications(notifications.emailNotifications2FA ?? false);
@@ -60,11 +50,7 @@ const Settings = () => {
 
   const handleEnableDisable2FA = async () => {
     const newValue = !is2FAEnabled;
-
-    // Set flag to prevent useEffect from overriding our optimistic update
     isToggling2FARef.current = true;
-
-    // Optimistically update UI immediately for smooth UX
     setIs2FAEnabled(newValue);
 
     try {
@@ -75,7 +61,6 @@ const Settings = () => {
         })
       );
 
-      // If the API call failed, revert the optimistic update
       if (
         result.type === "auth/EnableDisable2FA/rejected" ||
         (result.payload && !result.payload.success)
@@ -83,10 +68,8 @@ const Settings = () => {
         setIs2FAEnabled(!newValue);
       }
     } catch (error) {
-      // Revert on error
       setIs2FAEnabled(!newValue);
     } finally {
-      // Reset flag after a short delay to allow Redux state to update
       setTimeout(() => {
         isToggling2FARef.current = false;
       }, 100);
@@ -95,169 +78,107 @@ const Settings = () => {
 
   const handleToggleEmailNotifications = () => {
     setEmailNotifications(!emailNotifications);
-    // TODO: Add API call to save email notification preference
   };
 
   const handleToggleSmsNotifications = () => {
     setSmsNotifications(!smsNotifications);
-    // TODO: Add API call to save SMS notification preference
   };
 
+  const Toggle = ({ active, onClick, loading }) => (
+    <button
+      onClick={onClick}
+      disabled={loading}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${active ? "bg-primary" : "bg-white/10"}`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 shadow-lg ${active ? "translate-x-6" : "translate-x-1"} ${active ? "bg-black" : "bg-white"}`}
+      >
+        {loading && (
+           <span className="absolute inset-0 flex items-center justify-center">
+             <div className="w-2 h-2 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+           </span>
+        )}
+      </span>
+    </button>
+  );
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Account Settings</CardTitle>
-        <CardDescription>Manage your account preferences</CardDescription>
-      </CardHeader>
-      <div className="space-y-4 p-4">
-        <h3 className="text-lg font-semibold">Privacy</h3>
-        <div className="flex align-center justify-center gap-3">
-          <Button variant="outline" className="w-full justify-center">
-            Change Password
-          </Button>
-          <Button variant="outline" className="w-full justify-center">
-            Download My Data
-          </Button>
-          <Button variant="destructive" className="w-full justify-center">
-            Delete Account
-          </Button>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      {/* 1. SECURITY CONTROLS */}
+      <section className="space-y-6">
+        <div className="flex items-center gap-3">
+          <KeyRound className="text-primary" size={20} />
+          <h2 className="text-xl font-black text-white uppercase tracking-tight">Access Protocols</h2>
         </div>
-      </div>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Notifications</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="font-medium">Email Notifications</p>
-                <p className="text-sm text-muted-foreground">
-                  Receive order updates via email
-                </p>
+        
+        <div className="grid md:grid-cols-2 gap-4">
+           <Button variant="outline" className="h-16 justify-between gap-4 px-6 border-white/5 bg-white/5 hover:bg-white/10 rounded-2xl group transition-all">
+              <div className="flex items-center gap-4">
+                 <ShieldAlert size={18} className="text-white/40 group-hover:text-primary transition-colors" />
+                 <span className="text-xs font-black uppercase tracking-widest">Update Password</span>
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={emailNotifications}
-                aria-label={
-                  emailNotifications
-                    ? "Disable Email Notifications"
-                    : "Enable Email Notifications"
-                }
-                onClick={handleToggleEmailNotifications}
-                className={`
-                  relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 ease-in-out
-                  focus:outline-none focus:ring-2 focus:ring-[#682c0d] focus:ring-offset-2
-                  ${emailNotifications ? "bg-[#682c0d]" : "bg-gray-300"}
-                  ${emailNotifications ? "shadow-lg shadow-[#682c0d]/30" : ""}
-                `}
-              >
-                <span
-                  className={`
-                    inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-all duration-300 ease-in-out
-                    ${emailNotifications ? "translate-x-6" : "translate-x-1"}
-                  `}
-                />
-              </button>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="font-medium">SMS Notifications</p>
-                <p className="text-sm text-muted-foreground">
-                  Get delivery alerts via SMS
-                </p>
+              <ChevronRight size={14} className="text-white/20" />
+           </Button>
+           <Button variant="outline" className="h-16 justify-between gap-4 px-6 border-white/5 bg-white/5 hover:bg-white/10 rounded-2xl group transition-all text-red-500 hover:text-red-400">
+              <div className="flex items-center gap-4">
+                 <Trash2 size={18} className="opacity-40" />
+                 <span className="text-xs font-black uppercase tracking-widest">Deactivate Identity</span>
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={smsNotifications}
-                aria-label={
-                  smsNotifications
-                    ? "Disable SMS Notifications"
-                    : "Enable SMS Notifications"
-                }
-                onClick={handleToggleSmsNotifications}
-                className={`
-                  relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 ease-in-out
-                  focus:outline-none focus:ring-0 focus:ring-offset-2
-                  ${smsNotifications ? "bg-[#682c0d]" : "bg-gray-300"}
-                  ${smsNotifications ? "shadow-lg shadow-[#682c0d]/30" : ""}
-                `}
-              >
-                <span
-                  className={`
-                    inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-all duration-300 ease-in-out
-                    ${smsNotifications ? "translate-x-6" : "translate-x-1"}
-                  `}
-                />
-              </button>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="font-medium">2FA Authentication</p>
-                <p className="text-sm text-muted-foreground">
-                  Enable 2FA authentication for your account
-                </p>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={is2FAEnabled}
-                aria-label={
-                  is2FAEnabled
-                    ? "Disable 2FA Authentication"
-                    : "Enable 2FA Authentication"
-                }
-                onClick={handleEnableDisable2FA}
-                className={`
-                  relative outline-none inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 ease-in-out
-                  focus:outline-none focus:ring-0  focus:ring-offset-2
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  ${is2FAEnabled ? "bg-[#682c0d]" : "bg-gray-300"}
-                  ${is2FAEnabled ? "shadow-lg shadow-[#682c0d]/30" : ""}
-                `}
-              >
-                <span
-                  className={`
-                    inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-all duration-300 ease-in-out
-                    ${is2FAEnabled ? "translate-x-6" : "translate-x-1"}
-                  `}
-                >
-                  {notificationsLoading && (
-                    <span className="absolute inset-0 flex items-center justify-center">
-                      <svg
-                        className="h-3 w-3 animate-spin text-[#682c0d]"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                    </span>
-                  )}
-                </span>
-              </button>
-            </div>
-          </div>
+           </Button>
+        </div>
+      </section>
+
+      {/* 2. PREFERENCES (TOGGLES) */}
+      <section className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Bell className="text-primary" size={20} />
+          <h2 className="text-xl font-black text-white uppercase tracking-tight">Comm-Link Preferences</h2>
         </div>
 
-        <Separator />
-      </CardContent>
-    </Card>
+        <div className="glass border-white/5 rounded-3xl overflow-hidden divide-y divide-white/5">
+           {[
+             { title: "Email Manifests", desc: "Receive automated order manifests via linked SMTP", active: emailNotifications, onClick: handleToggleEmailNotifications },
+             { title: "SMS Alerts", desc: "Real-time delivery triangulation pings", active: smsNotifications, onClick: handleToggleSmsNotifications },
+             { title: "2FA Authentication", desc: "Secure multi-factor identity verification", active: is2FAEnabled, onClick: handleEnableDisable2FA, loading: notificationsLoading }
+           ].map((pref, i) => (
+             <div key={i} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+               <div className="space-y-1">
+                 <p className="text-sm font-black text-white uppercase tracking-tight">{pref.title}</p>
+                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{pref.desc}</p>
+               </div>
+               <Toggle active={pref.active} onClick={pref.onClick} loading={pref.loading} />
+             </div>
+           ))}
+        </div>
+      </section>
+
+      {/* 3. DATA VAULT */}
+      <section className="space-y-6">
+         <div className="flex items-center gap-3">
+            <Fingerprint className="text-primary" size={20} />
+            <h2 className="text-xl font-black text-white uppercase tracking-tight">Data Vault</h2>
+         </div>
+         <Button variant="outline" className="w-full h-16 justify-between gap-4 px-8 border-white/5 bg-white/5 hover:bg-white/10 rounded-2xl group transition-all">
+            <div className="flex items-center gap-4">
+               <Download size={18} className="text-primary" />
+               <div className="text-left">
+                  <span className="block text-xs font-black uppercase tracking-widest">Export Biological Data</span>
+                  <span className="block text-[8px] font-bold text-white/20 uppercase tracking-[0.2em] mt-1">Generate a comprehensive PII manifest</span>
+               </div>
+            </div>
+            <ChevronRight size={14} className="text-white/20" />
+         </Button>
+      </section>
+    </div>
   );
 };
+
+// Internal icon for consistency
+const ChevronRight = ({ size, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="m9 18 6-6-6-6"/>
+  </svg>
+);
 
 export default Settings;

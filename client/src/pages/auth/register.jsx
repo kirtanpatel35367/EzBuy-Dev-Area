@@ -1,44 +1,20 @@
-import CommonForm from '@/components/common/Form'
-import { registerFormControl } from '@/config'
 import { useToast } from '@/hooks/use-toast'
 import { registerUser } from '@/store/auth-slice'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
+import { Button } from "@/components/ui/button";
+import { User, Mail, Lock, ShieldPlus, ArrowRight, Loader2 } from "lucide-react";
 
 const Authregister = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const { toast } = useToast()
 
-    //Setting Form Data 
-    const [formData, setFormData] = useState({})
-    console.log(formData)
-    const onSubmit = (formData) => {
-        setFormData(formData)
-        dispatch(registerUser(formData)).then((data) => {  //Data Returned From API
-            if (data?.payload?.success) {
-                navigate('/auth/login')
-                toast({
-                    title: data?.payload.message,
-                })
-            }
-            else {
-                toast({
-                    title: data?.payload.message
-                })
-            }
-        }
-        )
-    }
-
-    //UseReact Hook Forms
     const {
         register,
-        control,
         handleSubmit,
-        watch,
         formState: { errors, isSubmitting }
     } = useForm({
         defaultValues: {
@@ -48,74 +24,124 @@ const Authregister = () => {
         }
     })
 
+    const onSubmit = (formData) => {
+        dispatch(registerUser(formData)).then((data) => {
+            if (data?.payload?.success) {
+                navigate('/auth/login')
+                toast({
+                    title: data?.payload.message,
+                    variant: "success",
+                })
+            }
+            else {
+                toast({
+                    title: data?.payload.message,
+                    variant: "destructive",
+                })
+            }
+        })
+    }
+
     return (
-        <div className='mx-auto w-full max-w-md space-y-6'>
-            <div className='text-center'>
-                <h1 className='font-bold text-3xl font-HeadFont'>Create New Account </h1>
-                <p className='  '>Already Have Account? <Link to={'/auth/login'} >Log In</Link> </p>
+        <div className="space-y-12">
+            {/* Header Info */}
+            <div className="space-y-2">
+                <div className="flex items-center gap-2 text-primary">
+                    <ShieldPlus size={14} className="fill-primary/20" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">New Identity Registration</span>
+                </div>
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">
+                    REGISTER <br /> <span className="text-white/20">NEW LINK.</span>
+                </h2>
+                <p className="text-xs font-bold text-white/40 uppercase tracking-widest leading-relaxed">
+                    Existing Operator? <Link to="/auth/login" className="text-primary hover:underline transition-all">Synchronize Identity</Link>
+                </p>
             </div>
 
-            <form action="" onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md mx-auto p-6 border rounded-lg ">
-                <div className="flex flex-col gap-4 font-HeadFont">
-                    <div className="flex flex-col">
-                        <label htmlFor="username" className="text-sm font-medium">User Name</label>
-                        <input
-                            placeholder="Enter UserName"
-                            type="text"
-                            {...register("username", {
-                                required: { value: true, message: "Username is Required" },
-                                // pattern: { value: /^ [a - zA - Z0 - 9](_(?!(\.|_))|\.(?!(_|\.))|[a-zA-Z0-9]){6, 18}[a-zA-Z0-9]$/, message: "Invalid Username" }
-                            })}
-                            className="mt-1 p-2 border rounded-md  focus:outline-none"
-                        />
-                        {
-                            errors.username && <span className='text-red-600 text-sm mt-1'>{errors.username.message}</span>
-                        }
+            {/* Form Area */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-6">
+                    {/* Username Input */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Identity Handle</label>
+                        <div className="relative group/field">
+                            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/field:text-primary transition-colors">
+                                <User size={18} />
+                            </div>
+                            <input
+                                placeholder="Enter Username"
+                                type="text"
+                                {...register("username", {
+                                    required: "Identity handle required",
+                                })}
+                                className="w-full h-16 pl-14 pr-6 bg-white/5 border border-white/10 rounded-2xl text-white font-bold focus:border-primary transition-all outline-none placeholder:text-white/10"
+                            />
+                            {errors.username && (
+                                <span className="absolute -bottom-6 left-1 text-[10px] font-black text-red-500 uppercase tracking-widest">{errors.username.message}</span>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="flex flex-col">
-                        <label htmlFor="email" className="text-sm font-medium">Email</label>
-                        <input
-                            placeholder="Enter Email"
-                            type="text"
-                            {...register("email", {
-                                required: { value: true, message: "Email is Required" },
-                                pattern: {
-                                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                                    message: "Invalied Email"
-                                },
-                            })}
-                            className="mt-1 p-2 border rounded-md  focus:outline-none"
-                        />
-                        {
-                            errors.email && <span className='text-red-600 text-sm mt-1'>{errors.email.message}</span>
-                        }
+                    {/* Email Input */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Electronic Mail Port</label>
+                        <div className="relative group/field">
+                            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/field:text-primary transition-colors">
+                                <Mail size={18} />
+                            </div>
+                            <input
+                                placeholder="operator@neural.net"
+                                type="email"
+                                {...register("email", {
+                                    required: "Coordinate required",
+                                    pattern: {
+                                        value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                                        message: "Invalid coordinate format"
+                                    }
+                                })}
+                                className="w-full h-16 pl-14 pr-6 bg-white/5 border border-white/10 rounded-2xl text-white font-bold focus:border-primary transition-all outline-none placeholder:text-white/10"
+                            />
+                            {errors.email && (
+                                <span className="absolute -bottom-6 left-1 text-[10px] font-black text-red-500 uppercase tracking-widest">{errors.email.message}</span>
+                            )}
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                        <label htmlFor="password" className="text-sm font-medium">Password</label>
-                        <input
-                            placeholder="Enter Password"
-                            type="password"
-                            {...register("password", {
-                                required: { value: true, message: "Password is Required" },
-                                // pattern: { value: /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/, message: "Invalid Password" }
-                            })}
-                            className="mt-1 p-2 border rounded-md  focus:outline-none"
-                        />
-                        {
-                            errors.password && <span className='text-red-600 text-sm mt-1'>{errors.password.message}</span>
-                        }
+
+                    {/* Password Input */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Secure Passcode</label>
+                        <div className="relative group/field">
+                            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-white/20 group-focus-within/field:text-primary transition-colors">
+                                <Lock size={18} />
+                            </div>
+                            <input
+                                placeholder="Create passcode"
+                                type="password"
+                                {...register("password", { required: "Passcode required" })}
+                                className="w-full h-16 pl-14 pr-6 bg-white/5 border border-white/10 rounded-2xl text-white font-bold focus:border-primary transition-all outline-none placeholder:text-white/10"
+                            />
+                            {errors.password && (
+                                <span className="absolute -bottom-6 left-1 text-[10px] font-black text-red-500 uppercase tracking-widest">{errors.password.message}</span>
+                            )}
+                        </div>
                     </div>
-                    <button
-                        className="bg-[#682c0d] text-white rounded-md px-4 py-2 cursor-pointer hover:bg-[#682b0dea] transition-all duration-300"
-                        type="submit"
+                </div>
+
+                <div className="pt-10">
+                    <Button
+                        disabled={isSubmitting}
+                        className="w-full h-20 bg-primary text-black font-black rounded-[1.5rem] text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_40px_rgba(204,255,0,0.15)] flex gap-4"
                     >
-                        Submit
-                    </button>
+                        {isSubmitting ? (
+                            <span className="flex items-center gap-3">
+                                <Loader2 className="animate-spin text-black" size={24} /> INITIALIZING...
+                            </span>
+                        ) : (
+                            <span className="flex items-center gap-4">INITIALIZE LINK <ArrowRight size={24} /></span>
+                        )}
+                    </Button>
                 </div>
             </form>
-
-            {/* <CommonForm formControls={registerFormControl} formData={formData} setFormData={setFormData} buttontext="Sign Up" onsubmit={onsubmit} /> */}
         </div>
     )
 }

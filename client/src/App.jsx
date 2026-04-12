@@ -28,6 +28,10 @@ import CheckAuth from "./components/common/CheckAuth";
 import Unauth from "./pages/unAuthPage/Unauth";
 import Success from "./pages/shopping-view/success";
 import Canncel from "./pages/shopping-view/cancel";
+import ProductDetailsPage from "./pages/shopping-view/ProductDetailsPage";
+import Categories from "./pages/shopping-view/Categories";
+import AboutUs from "./pages/shopping-view/AboutUs";
+import ContactUs from "./pages/shopping-view/ContactUs";
 import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "./store/auth-slice";
 
@@ -116,16 +120,27 @@ const App = () => {
           >
             <Route path="home" element={<HomePage />} />
             <Route path="productList" element={<ProductListing />} />
+            <Route path="product/:id" element={<ProductDetailsPage />} />
             <Route path="checkout" element={<CheckOut />} />
             <Route path="useraccount" element={<UserProfilePage />} />
             <Route path="success" element={<Success />} />
             <Route path="cancel" element={<Canncel />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="about" element={<AboutUs />} />
+            <Route path="contact" element={<ContactUs />} />
           </Route>
           <Route path="/unauth" element={<Unauth />} />
           <Route path="*" element={<PageNotFound />}></Route>
         </Routes>
       </div>
-      <Toaster position="top-right" richColors />
+      <Toaster 
+        position="top-right" 
+        richColors={false} 
+        toastOptions={{
+          className: "sonner-toast",
+          descriptionClassName: "sonner-desc",
+        }}
+      />
     </>
   );
 };
