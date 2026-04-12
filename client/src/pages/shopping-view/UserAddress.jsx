@@ -1,70 +1,36 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import Address from "./Address";
+import { MapPin, ShieldCheck } from "lucide-react";
 
+/**
+ * UserAddress sub-tab in the Account Dashboard.
+ * Reuses the primary Address management system for consistency.
+ */
 const UserAddress = () => {
   return (
-    <div className="grid gap-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Shipping Address</CardTitle>
-              <CardDescription>Your default shipping address</CardDescription>
-            </div>
-            <Badge>Default</Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="street">Street Address</Label>
-            <Input id="street" defaultValue="123 Main Street" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
-              <Input id="city" defaultValue="New York" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="state">State/Province</Label>
-              <Input id="state" defaultValue="NY" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="zip">ZIP Code</Label>
-              <Input id="zip" defaultValue="10001" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
-              <Input id="country" defaultValue="United States" />
-            </div>
-          </div>
-          <Button variant="outline" className="w-full md:w-auto">
-            Update Address
-          </Button>
-        </CardContent>
-      </Card>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Tab Context Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <MapPin className="text-primary" size={24} />
+          <h2 className="text-2xl font-black text-white uppercase tracking-tight">Logistics Vault</h2>
+        </div>
+        <div className="flex items-center gap-2 text-white/20 text-[10px] font-black uppercase tracking-widest bg-white/5 px-4 py-2 rounded-xl">
+           <ShieldCheck size={14} className="text-primary/40" />
+           <span>Secure Address Encryption Active</span>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Billing Address</CardTitle>
-          <CardDescription>Address for billing and invoices</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">Same as shipping address</p>
-          <Button variant="outline">Add Different Billing Address</Button>
-        </CardContent>
-      </Card>
+      <div className="glass rounded-[2rem] p-6 md:p-10 border-white/5">
+        <Address />
+      </div>
+
+      {/* Security Disclaimer */}
+      <div className="p-6 rounded-2xl border border-white/5 bg-white/[0.02]">
+        <p className="text-[10px] text-white/20 font-bold uppercase leading-relaxed tracking-wider">
+          NOTICE: All shipping coordinates are encrypted before storage. We do not share your physical logistics data with third-party vendors outside the encrypted delivery pipeline.
+        </p>
+      </div>
     </div>
   );
 };
